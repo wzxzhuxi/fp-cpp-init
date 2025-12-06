@@ -34,3 +34,11 @@ endif()
 
 # 安装
 install(TARGETS fp-cpp-init DESTINATION bin)
+
+# 测试
+option(BUILD_TESTING "Build tests" OFF)
+
+if(BUILD_TESTING)
+    enable_testing()
+    add_subdirectory(tests)
+endif()
