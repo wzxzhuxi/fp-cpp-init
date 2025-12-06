@@ -67,9 +67,8 @@ auto generate_exe_project(const Options& opts, const RenderContext& ctx) -> Proj
     }
 
     // include/project/result.hpp (函数式错误处理)
-    project.files.push_back(
-        {opts.project_name + "/include/" + opts.project_name + "/result.hpp",
-         render(templates::result_hpp, ctx)});
+    project.files.push_back({opts.project_name + "/include/" + opts.project_name + "/result.hpp",
+                             render(templates::result_hpp, ctx)});
 
     // src/main.cpp
     project.files.push_back(
@@ -97,9 +96,8 @@ auto generate_lib_project(const Options& opts, const RenderContext& ctx) -> Proj
         {opts.project_name + "/tests/CMakeLists.txt", render(templates::cmake_tests, ctx)});
 
     // include/project/result.hpp (��数式错误处理)
-    project.files.push_back(
-        {opts.project_name + "/include/" + opts.project_name + "/result.hpp",
-         render(templates::result_hpp, ctx)});
+    project.files.push_back({opts.project_name + "/include/" + opts.project_name + "/result.hpp",
+                             render(templates::result_hpp, ctx)});
 
     // include/project/project.hpp
     project.files.push_back(

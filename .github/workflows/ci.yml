@@ -104,7 +104,13 @@ jobs:
         run: cmake --build build --config Debug
 
       - name: Run unit tests
-        run: ctest --test-dir build --output-on-failure --config Debug
+        shell: bash
+        run: |
+          if [[ "$RUNNER_OS" == "Windows" ]]; then
+            ctest --test-dir build --output-on-failure --config Debug
+          else
+            ctest --test-dir build --output-on-failure
+          fi
 
   # 代码覆盖率（仅 Linux）
   coverage:
@@ -138,8 +144,8 @@ jobs:
 
       - name: Generate Coverage Report
         run: |
-          lcov --capture --directory build --output-file coverage.info
-          lcov --remove coverage.info '/usr/*' '*/tests/*' '*/_deps/*' --output-file coverage.info
+          lcov --capture --directory build --output-file coverage.info --ignore-errors source
+          lcov --remove coverage.info '/usr/*' '*/tests/*' '*/_deps/*' --output-file coverage.info --ignore-errors unused
           lcov --list coverage.info
 
       - name: Upload to Codecov
