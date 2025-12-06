@@ -1,9 +1,9 @@
-#include "cli.hpp"
+#include "fp-cpp-init/cli.hpp"
 
 #include <cstring>
 #include <sstream>
 
-#include "platform.hpp"
+#include "fp-cpp-init/platform.hpp"
 
 namespace fp {
 

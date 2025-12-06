@@ -1,7 +1,7 @@
-#include "project.hpp"
+#include "fp-cpp-init/project.hpp"
 
-#include "render.hpp"
-#include "templates.hpp"
+#include "fp-cpp-init/render.hpp"
+#include "fp-cpp-init/templates.hpp"
 
 namespace fp {
 

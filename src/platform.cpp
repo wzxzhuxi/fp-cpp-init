@@ -1,4 +1,4 @@
-#include "platform.hpp"
+#include "fp-cpp-init/platform.hpp"
 
 #ifdef _WIN32
 #include <windows.h>

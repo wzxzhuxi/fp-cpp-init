@@ -2,10 +2,10 @@
 #include <fstream>
 #include <iostream>
 
-#include "cli.hpp"
-#include "platform.hpp"
-#include "project.hpp"
-#include "render.hpp"
+#include "fp-cpp-init/cli.hpp"
+#include "fp-cpp-init/platform.hpp"
+#include "fp-cpp-init/project.hpp"
+#include "fp-cpp-init/render.hpp"
 
 namespace fs = std::filesystem;
 
