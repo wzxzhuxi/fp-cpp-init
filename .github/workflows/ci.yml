@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure CMake
+        run: cmake -B build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build build --config Release
+
+      - name: Test Help
+        shell: bash
+        run: |
+          if [[ "$RUNNER_OS" == "Windows" ]]; then
+            ./build/Release/fp-cpp-init.exe --help
+          else
+            ./build/fp-cpp-init --help
+          fi
+
+      - name: Test Version
+        shell: bash
+        run: |
+          if [[ "$RUNNER_OS" == "Windows" ]]; then
+            ./build/Release/fp-cpp-init.exe --version
+          else
+            ./build/fp-cpp-init --version
+          fi
+
+      - name: Test Create Project
+        shell: bash
+        run: |
+          cd /tmp || cd $RUNNER_TEMP
+          if [[ "$RUNNER_OS" == "Windows" ]]; then
+            "$GITHUB_WORKSPACE/build/Release/fp-cpp-init.exe" new testproject --type=exe
+          else
+            "$GITHUB_WORKSPACE/build/fp-cpp-init" new testproject --type=exe
+          fi
+          ls -la testproject/
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: fp-cpp-init-${{ matrix.os }}
+          path: |
+            build/fp-cpp-init
+            build/Release/fp-cpp-init.exe

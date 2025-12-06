@@ -1,0 +1,50 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            artifact: fp-cpp-init-linux-x86_64
+            binary: build/fp-cpp-init
+          - os: macos-latest
+            artifact: fp-cpp-init-macos-x86_64
+            binary: build/fp-cpp-init
+          - os: windows-latest
+            artifact: fp-cpp-init-windows-x86_64.exe
+            binary: build/Release/fp-cpp-init.exe
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure CMake
+        run: cmake -B build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build build --config Release
+
+      - name: Rename Binary (Unix)
+        if: runner.os != 'Windows'
+        run: mv ${{ matrix.binary }} ${{ matrix.artifact }}
+
+      - name: Rename Binary (Windows)
+        if: runner.os == 'Windows'
+        run: move ${{ matrix.binary }} ${{ matrix.artifact }}
+
+      - name: Upload Release Asset
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ matrix.artifact }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
