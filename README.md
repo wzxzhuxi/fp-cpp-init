@@ -2,6 +2,7 @@
 
 [![CI](https://github.com/wzxzhuxi/fp-cpp-init/actions/workflows/ci.yml/badge.svg)](https://github.com/wzxzhuxi/fp-cpp-init/actions/workflows/ci.yml)
 [![Release](https://github.com/wzxzhuxi/fp-cpp-init/actions/workflows/release.yml/badge.svg)](https://github.com/wzxzhuxi/fp-cpp-init/releases)
+[![codecov](https://codecov.io/gh/wzxzhuxi/fp-cpp-init/graph/badge.svg)](https://codecov.io/gh/wzxzhuxi/fp-cpp-init)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 C++ Project Scaffolding Tool - 快速初始化 C++ 项目。
@@ -15,9 +16,9 @@ C++ Project Scaffolding Tool - 快速初始化 C++ 项目。
   - `lib` - 静态库项目
   - `header` - 头文件库项目
 - **多种开源许可证**：MIT、Apache 2.0、GPL v3、BSD 3-Clause
-- **自动配置**：生成 `.clang-format` 和 `.clang-tidy`
+- **自动配置**：生成 `.clang-format` 和 `.clang-tidy`（可选）
 - **Git 集成**：自动读取 git config 中的作者信息
-- **CI/CD**：自动化构建和发布 CI/CD
+- **CI/CD**：自动化构建和发布（可选）
 
 ## 安装
 
@@ -60,6 +61,9 @@ fp-cpp-init new myproject --std=23 --license=apache2
 # 指定作者和描述
 fp-cpp-init new myproject --author="John Doe" --desc="My awesome project"
 
+# 禁用 CI/CD 和代码检查
+fp-cpp-init new myapp --no-ci --no-lint
+
 # 查看帮助
 fp-cpp-init --help
 fp-cpp-init new --help
@@ -74,6 +78,42 @@ fp-cpp-init new --help
 | `--std` | `-s` | `20` | C++ 标准：17, 20, 23 |
 | `--author` | `-a` | git config | 作者名 |
 | `--desc` | `-d` | 空 | 项目描述 |
+| `--no-ci` | - | false | 禁用 GitHub Actions CI/CD |
+| `--no-lint` | - | false | 禁用 .clang-format 和 .clang-tidy |
+
+## 生成的项目功能
+
+生成的项目默认包含以下功能（可通过参数禁用）：
+
+| 功能 | 默认 | 禁用参数 | 说明 |
+|------|:----:|----------|------|
+| GitHub Actions CI | ✓ | `--no-ci` | 三平台自动构建（Linux/macOS/Windows） |
+| GitHub Actions Release | ✓ | `--no-ci` | 自动发布二进制（仅 exe 类型） |
+| clang-format | ✓ | `--no-lint` | 代码格式化配置 |
+| clang-tidy | ✓ | `--no-lint` | 静态分析配置 |
+| CMake 严格警告 | ✓ | - | -Wall -Wextra -Wpedantic |
+| .gitignore | ✓ | - | Git 忽略规则 |
+| LICENSE | ✓ | `--license=none` | 开源许可证 |
+
+### 项目模板对比
+
+```bash
+# 完整项目（默认）
+fp-cpp-init new myapp
+# → 9 个文件（CI/CD + lint + 全部配置）
+
+# 无 CI/CD
+fp-cpp-init new myapp --no-ci
+# → 7 个文件（无 .github/workflows/）
+
+# 无代码检查
+fp-cpp-init new myapp --no-lint
+# → 7 个文件（无 .clang-format/.clang-tidy）
+
+# 最小项目
+fp-cpp-init new myapp --no-ci --no-lint --license=none
+# → 4 个文件（仅 CMakeLists.txt、main.cpp、README、.gitignore）
+```
 
 ## 生成的项目结构
 
@@ -81,15 +121,19 @@ fp-cpp-init new --help
 
 ```
 myapp/
-├── CMakeLists.txt
-├── src/
-│   └── main.cpp
+├── .github/
+│   └── workflows/
+│       ├── ci.yml          # 三平台 CI
+│       └── release.yml     # 自动发布
 ├── include/
 │   └── myapp/
+├── src/
+│   └── main.cpp
 ├── tests/
+├── .clang-format           # 代码格式化
+├── .clang-tidy             # 静态分析
 ├── .gitignore
-├── .clang-format
-├── .clang-tidy
+├── CMakeLists.txt
 ├── LICENSE
 └── README.md
 ```
@@ -98,18 +142,21 @@ myapp/
 
 ```
 mylib/
-├── CMakeLists.txt
-├── src/
-│   └── mylib.cpp
+├── .github/
+│   └── workflows/
+│       └── ci.yml          # 三平台 CI（无 release）
 ├── include/
 │   └── mylib/
 │       └── mylib.hpp
+├── src/
+│   └── mylib.cpp
 ├── tests/
 │   ├── CMakeLists.txt
 │   └── test_main.cpp
-├── .gitignore
 ├── .clang-format
 ├── .clang-tidy
+├── .gitignore
+├── CMakeLists.txt
 ├── LICENSE
 └── README.md
 ```
@@ -118,7 +165,9 @@ mylib/
 
 ```
 myheader/
-├── CMakeLists.txt
+├── .github/
+│   └── workflows/
+│       └── ci.yml          # 三平台 CI（无 release）
 ├── include/
 │   └── myheader/
 │       └── myheader.hpp
@@ -128,9 +177,10 @@ myheader/
 ├── tests/
 │   ├── CMakeLists.txt
 │   └── test_main.cpp
-├── .gitignore
 ├── .clang-format
 ├── .clang-tidy
+├── .gitignore
+├── CMakeLists.txt
 ├── LICENSE
 └── README.md
 ```
@@ -159,6 +209,19 @@ myheader/
 - **Result<T>**：用于错误处理的 Monad
 - **纯函数**：`parse_args`、`render_*`、`generate_project` 无副作用
 - **副作用边界**：所有 IO 操作集中在 `main.cpp`
+
+### 源码结构
+
+```
+src/
+├── main.cpp        # 入口，副作用边界
+├── cli.hpp/cpp     # 命令行解析（纯函数）
+├── project.hpp/cpp # 项目生成（纯函数）
+├── render.hpp/cpp  # 模板渲染（纯函数）
+├── templates.hpp   # 模板字符串常量
+├── result.hpp      # Result<T> Monad
+└── platform.hpp/cpp# 跨平台抽象
+```
 
 ## CI/CD
 
@@ -204,9 +267,10 @@ myheader/
 
 **执行步骤**：
 1. 检出代码 (`actions/checkout`)
-2. 配置 CMake (`cmake -B build`)
-3. 编译项目 (`cmake --build build`)
-4. 运行测试 (`--help`, `--version`, 创建项目)
+2. 代码格式检查 (`clang-format`)
+3. 静态分析 (`clang-tidy`)
+4. 三平台构建和测试
+5. 代码覆盖率上传 (`codecov`)
 
 ### Release 配置 (`.github/workflows/release.yml`)
 
