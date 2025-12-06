@@ -1,7 +1,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <string>
 
-#include "render.hpp"
+#include "fp-cpp-init/render.hpp"
 
 using namespace fp;
 

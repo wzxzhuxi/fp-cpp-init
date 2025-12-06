@@ -1,7 +1,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <string>
 
-#include "result.hpp"
+#include "fp-cpp-init/result.hpp"
 
 using namespace fp;
 

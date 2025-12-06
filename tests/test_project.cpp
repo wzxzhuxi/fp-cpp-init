@@ -2,7 +2,7 @@
 #include <algorithm>
 #include <string>
 
-#include "project.hpp"
+#include "fp-cpp-init/project.hpp"
 
 using namespace fp;
 

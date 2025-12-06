@@ -14,7 +14,7 @@ add_library(fp-cpp-init-lib STATIC
     ${CMAKE_SOURCE_DIR}/src/render.cpp
     ${CMAKE_SOURCE_DIR}/src/platform.cpp
 )
-target_include_directories(fp-cpp-init-lib PUBLIC ${CMAKE_SOURCE_DIR}/src)
+target_include_directories(fp-cpp-init-lib PUBLIC ${CMAKE_SOURCE_DIR}/include)
 
 # 跨平台编译选项
 if(MSVC)

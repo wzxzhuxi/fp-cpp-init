@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-#include "cli.hpp"
+#include "fp-cpp-init/cli.hpp"
 
 using namespace fp;
 

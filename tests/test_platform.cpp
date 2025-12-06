@@ -3,7 +3,7 @@
 #include <sstream>
 #include <string>
 
-#include "platform.hpp"
+#include "fp-cpp-init/platform.hpp"
 
 using namespace fp;
 
