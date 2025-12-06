@@ -21,7 +21,7 @@ add_executable(fp-cpp-init
 )
 
 target_include_directories(fp-cpp-init PRIVATE
-    ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/include
 )
 
 # 跨平台编译选项
