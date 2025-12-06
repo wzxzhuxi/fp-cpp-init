@@ -13,14 +13,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install clang-format-18
+      - name: Install clang-format-21
         run: |
+          wget -qO- https://apt.llvm.org/llvm-snapshot.gpg.key | sudo tee /etc/apt/trusted.gpg.d/apt.llvm.org.asc
+          echo "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy main" | sudo tee /etc/apt/sources.list.d/llvm.list
           sudo apt-get update
-          sudo apt-get install -y clang-format-18
+          sudo apt-get install -y clang-format-21
 
       - name: Check clang-format
         run: |
-          find src include -name '*.cpp' -o -name '*.hpp' | xargs clang-format-18 --dry-run --Werror
+          clang-format-21 --version
+          find src include -name '*.cpp' -o -name '*.hpp' | xargs clang-format-21 --dry-run --Werror
 
   # 静态分析
   analyze:
