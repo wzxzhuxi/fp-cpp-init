@@ -6,6 +6,8 @@ AllowShortFunctionsOnASingleLine: Inline
 AllowShortIfStatementsOnASingleLine: Never
 AllowShortLoopsOnASingleLine: false
 AlwaysBreakTemplateDeclarations: Yes
+BinPackParameters: false
+AllowAllParametersOfDeclarationOnNextLine: false
 PointerAlignment: Left
 SpaceAfterCStyleCast: false
 SpaceBeforeParens: ControlStatements
