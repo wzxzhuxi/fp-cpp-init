@@ -1,17 +1,13 @@
 #pragma once
 
-#include "result.hpp"
 #include <string>
+
+#include "result.hpp"
 
 namespace fp {
 
 // 命令类型
-enum class Command {
-    Help,
-    NewHelp,
-    Version,
-    New
-};
+enum class Command { Help, NewHelp, Version, New };
 
 // 不可变选项结构
 struct Options {
@@ -22,6 +18,8 @@ struct Options {
     std::string cpp_std;
     std::string author;
     std::string description;
+    bool enable_ci = true;
+    bool enable_lint = true;
 };
 
 // 纯函数：解析命令行参数

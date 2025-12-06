@@ -24,10 +24,14 @@ auto render(std::string_view tmpl, const RenderContext& ctx) -> std::string {
 }
 
 auto get_license_display_name(std::string_view license) -> std::string {
-    if (license == "mit") return "MIT License";
-    if (license == "apache2") return "Apache License 2.0";
-    if (license == "gpl3") return "GNU General Public License v3.0";
-    if (license == "bsd3") return "BSD 3-Clause License";
+    if (license == "mit")
+        return "MIT License";
+    if (license == "apache2")
+        return "Apache License 2.0";
+    if (license == "gpl3")
+        return "GNU General Public License v3.0";
+    if (license == "bsd3")
+        return "BSD 3-Clause License";
     return "";
 }
 

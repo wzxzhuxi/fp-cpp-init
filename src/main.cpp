@@ -1,10 +1,11 @@
+#include <filesystem>
+#include <fstream>
+#include <iostream>
+
 #include "cli.hpp"
 #include "platform.hpp"
 #include "project.hpp"
 #include "render.hpp"
-#include <filesystem>
-#include <fstream>
-#include <iostream>
 
 namespace fs = std::filesystem;
 
@@ -76,53 +77,51 @@ int main(int argc, char* argv[]) {
 
     // 处理命令
     switch (opts.command) {
-        case fp::Command::Help:
-            std::cout << fp::get_help_text();
-            return 0;
+    case fp::Command::Help:
+        std::cout << fp::get_help_text();
+        return 0;
 
-        case fp::Command::NewHelp:
-            std::cout << fp::get_new_help_text();
-            return 0;
+    case fp::Command::NewHelp:
+        std::cout << fp::get_new_help_text();
+        return 0;
 
-        case fp::Command::Version:
-            std::cout << fp::get_version_text();
-            return 0;
+    case fp::Command::Version:
+        std::cout << fp::get_version_text();
+        return 0;
 
-        case fp::Command::New: {
-            // 检查目录是否已存在
-            if (fs::exists(opts.project_name)) {
-                fp::platform::print_error("Directory '" + opts.project_name + "' already exists.");
-                return 1;
-            }
-
-            std::cout << "Creating project '" << opts.project_name << "'...\n\n";
-
-            // 构建渲染上下文（纯数据）
-            fp::RenderContext ctx{
-                .project_name = opts.project_name,
-                .description = opts.description,
-                .cpp_std = opts.cpp_std,
-                .author = opts.author,
-                .year = fp::platform::get_current_year(),
-                .license_name = fp::get_license_display_name(opts.license)
-            };
-
-            // 生成项目结构（纯函数）
-            auto project = fp::generate_project(opts, ctx);
-
-            // 写入文件（副作用）
-            auto write_result = write_project(project);
-
-            if (write_result.is_err()) {
-                fp::platform::print_error(write_result.error());
-                return 1;
-            }
-
-            fp::platform::print_success("Project created successfully!");
-            print_next_steps(opts);
-
-            return 0;
+    case fp::Command::New: {
+        // 检查目录是否已存在
+        if (fs::exists(opts.project_name)) {
+            fp::platform::print_error("Directory '" + opts.project_name + "' already exists.");
+            return 1;
         }
+
+        std::cout << "Creating project '" << opts.project_name << "'...\n\n";
+
+        // 构建渲染上下文（纯数据）
+        fp::RenderContext ctx{.project_name = opts.project_name,
+                              .description = opts.description,
+                              .cpp_std = opts.cpp_std,
+                              .author = opts.author,
+                              .year = fp::platform::get_current_year(),
+                              .license_name = fp::get_license_display_name(opts.license)};
+
+        // 生成项目结构（纯函数）
+        auto project = fp::generate_project(opts, ctx);
+
+        // 写入文件（副作用）
+        auto write_result = write_project(project);
+
+        if (write_result.is_err()) {
+            fp::platform::print_error(write_result.error());
+            return 1;
+        }
+
+        fp::platform::print_success("Project created successfully!");
+        print_next_steps(opts);
+
+        return 0;
+    }
     }
 
     return 1;

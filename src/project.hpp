@@ -1,10 +1,11 @@
 #pragma once
 
-#include "cli.hpp"
-#include "render.hpp"
 #include <filesystem>
 #include <string>
 #include <vector>
+
+#include "cli.hpp"
+#include "render.hpp"
 
 namespace fp {
 

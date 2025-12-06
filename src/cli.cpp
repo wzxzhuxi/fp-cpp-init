@@ -1,7 +1,9 @@
 #include "cli.hpp"
-#include "platform.hpp"
+
 #include <cstring>
 #include <sstream>
+
+#include "platform.hpp"
 
 namespace fp {
 
@@ -29,8 +31,8 @@ auto is_valid_type(const std::string& type) -> bool {
 }
 
 auto is_valid_license(const std::string& license) -> bool {
-    return license == "mit" || license == "apache2" || license == "gpl3" ||
-           license == "bsd3" || license == "none";
+    return license == "mit" || license == "apache2" || license == "gpl3" || license == "bsd3" ||
+           license == "none";
 }
 
 auto is_valid_std(const std::string& std) -> bool {
@@ -40,15 +42,15 @@ auto is_valid_std(const std::string& std) -> bool {
 } // anonymous namespace
 
 auto parse_args(int argc, char* argv[]) -> Result<Options> {
-    Options opts{
-        .command = Command::Help,
-        .project_name = "",
-        .type = "exe",
-        .license = "mit",
-        .cpp_std = "20",
-        .author = platform::get_git_username().value_or(""),
-        .description = ""
-    };
+    Options opts{.command = Command::Help,
+                 .project_name = "",
+                 .type = "exe",
+                 .license = "mit",
+                 .cpp_std = "20",
+                 .author = platform::get_git_username().value_or(""),
+                 .description = "",
+                 .enable_ci = true,
+                 .enable_lint = true};
 
     if (argc < 2) {
         return Result<Options>::ok(opts);
@@ -71,10 +73,8 @@ auto parse_args(int argc, char* argv[]) -> Result<Options> {
         opts.command = Command::New;
 
         if (argc < 3) {
-            return Result<Options>::err(
-                "Error: Project name required.\n"
-                "Usage: fp-cpp-init new <project-name> [options]"
-            );
+            return Result<Options>::err("Error: Project name required.\n"
+                                        "Usage: fp-cpp-init new <project-name> [options]");
         }
 
         std::string second_arg = argv[2];
@@ -97,29 +97,30 @@ auto parse_args(int argc, char* argv[]) -> Result<Options> {
 
             if ((val = get_option_value(arg, "--type", "-t")) != "") {
                 if (!is_valid_type(val)) {
-                    return Result<Options>::err(
-                        "Error: Invalid type '" + val + "'. Must be: exe, lib, or header"
-                    );
+                    return Result<Options>::err("Error: Invalid type '" + val +
+                                                "'. Must be: exe, lib, or header");
                 }
                 opts.type = val;
             } else if ((val = get_option_value(arg, "--license", "-l")) != "") {
                 if (!is_valid_license(val)) {
-                    return Result<Options>::err(
-                        "Error: Invalid license '" + val + "'. Must be: mit, apache2, gpl3, bsd3, or none"
-                    );
+                    return Result<Options>::err("Error: Invalid license '" + val +
+                                                "'. Must be: mit, apache2, gpl3, bsd3, or none");
                 }
                 opts.license = val;
             } else if ((val = get_option_value(arg, "--std", "-s")) != "") {
                 if (!is_valid_std(val)) {
-                    return Result<Options>::err(
-                        "Error: Invalid C++ standard '" + val + "'. Must be: 17, 20, or 23"
-                    );
+                    return Result<Options>::err("Error: Invalid C++ standard '" + val +
+                                                "'. Must be: 17, 20, or 23");
                 }
                 opts.cpp_std = val;
             } else if ((val = get_option_value(arg, "--author", "-a")) != "") {
                 opts.author = val;
             } else if ((val = get_option_value(arg, "--desc", "-d")) != "") {
                 opts.description = val;
+            } else if (strcmp(arg, "--no-ci") == 0) {
+                opts.enable_ci = false;
+            } else if (strcmp(arg, "--no-lint") == 0) {
+                opts.enable_lint = false;
             } else {
                 return Result<Options>::err("Error: Unknown option '" + std::string(arg) + "'");
             }
@@ -169,6 +170,9 @@ OPTIONS:
     -a, --author=<NAME>     Author name [default: git config user.name]
     -d, --desc=<TEXT>       Project description
 
+    --no-ci                 Disable GitHub Actions CI/CD
+    --no-lint               Disable .clang-format and .clang-tidy
+
 PROJECT TYPES:
     exe     Executable application (with main.cpp)
     lib     Static library (with .hpp and .cpp)
@@ -179,6 +183,7 @@ EXAMPLES:
     fp-cpp-init new mylib --type=lib --std=20
     fp-cpp-init new myheader --type=header --license=apache2
     fp-cpp-init new myproject --author="John Doe" --desc="My awesome project"
+    fp-cpp-init new myapp --no-ci --no-lint
 )";
 }
 
