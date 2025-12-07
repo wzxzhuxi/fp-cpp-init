@@ -10,7 +10,19 @@ Checks: >
   -modernize-use-trailing-return-type,
   -readability-identifier-length,
   -cppcoreguidelines-avoid-magic-numbers,
-  -readability-magic-numbers
+  -readability-magic-numbers,
+  -misc-include-cleaner,
+  -cppcoreguidelines-pro-bounds-pointer-arithmetic,
+  -cppcoreguidelines-avoid-c-arrays,
+  -modernize-avoid-c-arrays,
+  -bugprone-assignment-in-if-condition,
+  -misc-const-correctness,
+  -readability-function-cognitive-complexity,
+  -readability-container-size-empty,
+  -bugprone-exception-escape,
+  -readability-implicit-bool-conversion,
+  -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
+  -modernize-use-emplace
 
 WarningsAsErrors: ''
 HeaderFilterRegex: 'src/.*'

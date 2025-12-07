@@ -194,7 +194,7 @@ constexpr const char* result_hpp = R"(#pragma once
 #include <string>
 #include <variant>
 
-namespace {{PROJECT_NAME}} {
+namespace {{PROJECT_NAME_ID}} {
 
 /**
  * @brief Result<T> - Functional error handling monad
@@ -210,9 +210,8 @@ namespace {{PROJECT_NAME}} {
  *       handle_error(result.error());
  *   }
  */
-template<typename T>
-class Result {
-public:
+template <typename T> class Result {
+  public:
     static auto ok(T value) -> Result { return Result{std::move(value)}; }
     static auto err(std::string error) -> Result { return Result{std::move(error)}; }
 
@@ -225,8 +224,7 @@ public:
     /**
      * @brief Transform the value if Ok, propagate error if Err
      */
-    template<typename F>
-    auto map(F&& f) const -> Result<decltype(f(std::declval<T>()))> {
+    template <typename F> auto map(F&& f) const -> Result<decltype(f(std::declval<T>()))> {
         using U = decltype(f(std::declval<T>()));
         if (is_ok()) {
             return Result<U>::ok(f(value()));
@@ -237,22 +235,21 @@ public:
     /**
      * @brief Chain operations that return Result
      */
-    template<typename F>
-    auto and_then(F&& f) const -> decltype(f(std::declval<T>())) {
+    template <typename F> auto and_then(F&& f) const -> decltype(f(std::declval<T>())) {
         if (is_ok()) {
             return f(value());
         }
         return decltype(f(std::declval<T>()))::err(error());
     }
 
-private:
+  private:
     explicit Result(T val) : data_(std::move(val)) {}
     explicit Result(std::string err) : data_(std::move(err)) {}
 
     std::variant<T, std::string> data_;
 };
 
-} // namespace {{PROJECT_NAME}}
+} // namespace {{PROJECT_NAME_ID}}
 )";
 
 // =============================================================================
@@ -264,7 +261,7 @@ constexpr const char* main_cpp = R"(#include <iostream>
 
 #include "{{PROJECT_NAME}}/result.hpp"
 
-namespace {{PROJECT_NAME}} {
+namespace {{PROJECT_NAME_ID}} {
 
 // =============================================================================
 // Pure Functions - No side effects, same input always produces same output
@@ -293,7 +290,8 @@ auto parse_int(std::string_view input) -> Result<int> {
         size_t pos = 0;
         int result = std::stoi(std::string(input), &pos);
         if (pos != input.size()) {
-            return Result<int>::err("Invalid integer: trailing characters in '" + std::string(input) + "'");
+            return Result<int>::err("Invalid integer: trailing characters in '" +
+                                    std::string(input) + "'");
         }
         return Result<int>::ok(result);
     } catch (const std::exception&) {
@@ -301,7 +299,7 @@ auto parse_int(std::string_view input) -> Result<int> {
     }
 }
 
-} // namespace {{PROJECT_NAME}}
+} // namespace {{PROJECT_NAME_ID}}
 
 // =============================================================================
 // Main - Side Effect Boundary (all IO happens here)
@@ -309,20 +307,20 @@ auto parse_int(std::string_view input) -> Result<int> {
 
 int main() {
     // Call pure functions
-    auto message = {{PROJECT_NAME}}::greet("{{PROJECT_NAME}}");
+    auto message = {{PROJECT_NAME_ID}}::greet("{{PROJECT_NAME}}");
     std::cout << message << std::endl;
 
     // Demonstrate pure arithmetic
-    std::cout << "2 + 3 = " << {{PROJECT_NAME}}::add(2, 3) << std::endl;
+    std::cout << "2 + 3 = " << {{PROJECT_NAME_ID}}::add(2, 3) << std::endl;
 
     // Use Result for error handling (no exceptions)
-    auto result = {{PROJECT_NAME}}::parse_int("42");
+    auto result = {{PROJECT_NAME_ID}}::parse_int("42");
     if (result.is_ok()) {
         std::cout << "Parsed: " << result.value() << std::endl;
     }
 
     // Demonstrate error case
-    auto bad_result = {{PROJECT_NAME}}::parse_int("not_a_number");
+    auto bad_result = {{PROJECT_NAME_ID}}::parse_int("not_a_number");
     if (bad_result.is_err()) {
         std::cout << "Error: " << bad_result.error() << std::endl;
     }
@@ -338,7 +336,7 @@ constexpr const char* lib_hpp = R"(#pragma once
 
 #include "{{PROJECT_NAME}}/result.hpp"
 
-namespace {{PROJECT_NAME}} {
+namespace {{PROJECT_NAME_ID}} {
 
 // =============================================================================
 // Pure Functions - No side effects, same input always produces same output
@@ -360,12 +358,12 @@ auto add(int a, int b) -> int;
  */
 auto parse_int(std::string_view input) -> Result<int>;
 
-} // namespace {{PROJECT_NAME}}
+} // namespace {{PROJECT_NAME_ID}}
 )";
 
 constexpr const char* lib_cpp = R"(#include "{{PROJECT_NAME}}/{{PROJECT_NAME}}.hpp"
 
-namespace {{PROJECT_NAME}} {
+namespace {{PROJECT_NAME_ID}} {
 
 auto greet(std::string_view name) -> std::string {
     return std::string("Hello, ") + std::string(name) + "!";
@@ -380,7 +378,8 @@ auto parse_int(std::string_view input) -> Result<int> {
         size_t pos = 0;
         int result = std::stoi(std::string(input), &pos);
         if (pos != input.size()) {
-            return Result<int>::err("Invalid integer: trailing characters in '" + std::string(input) + "'");
+            return Result<int>::err("Invalid integer: trailing characters in '" +
+                                    std::string(input) + "'");
         }
         return Result<int>::ok(result);
     } catch (const std::exception&) {
@@ -388,7 +387,7 @@ auto parse_int(std::string_view input) -> Result<int> {
     }
 }
 
-} // namespace {{PROJECT_NAME}}
+} // namespace {{PROJECT_NAME_ID}}
 )";
 
 constexpr const char* header_only_hpp = R"(#pragma once
@@ -397,7 +396,7 @@ constexpr const char* header_only_hpp = R"(#pragma once
 #include <string_view>
 #include <variant>
 
-namespace {{PROJECT_NAME}} {
+namespace {{PROJECT_NAME_ID}} {
 
 // =============================================================================
 // Result<T> - Functional Error Handling Monad
@@ -409,9 +408,8 @@ namespace {{PROJECT_NAME}} {
  * Represents either a successful value (Ok) or an error message (Err).
  * Enables explicit error handling without exceptions.
  */
-template<typename T>
-class Result {
-public:
+template <typename T> class Result {
+  public:
     static auto ok(T value) -> Result { return Result{std::move(value)}; }
     static auto err(std::string error) -> Result { return Result{std::move(error)}; }
 
@@ -421,8 +419,7 @@ public:
     [[nodiscard]] auto value() const -> const T& { return std::get<T>(data_); }
     [[nodiscard]] auto error() const -> const std::string& { return std::get<std::string>(data_); }
 
-    template<typename F>
-    auto map(F&& f) const -> Result<decltype(f(std::declval<T>()))> {
+    template <typename F> auto map(F&& f) const -> Result<decltype(f(std::declval<T>()))> {
         using U = decltype(f(std::declval<T>()));
         if (is_ok()) {
             return Result<U>::ok(f(value()));
@@ -430,15 +427,14 @@ public:
         return Result<U>::err(error());
     }
 
-    template<typename F>
-    auto and_then(F&& f) const -> decltype(f(std::declval<T>())) {
+    template <typename F> auto and_then(F&& f) const -> decltype(f(std::declval<T>())) {
         if (is_ok()) {
             return f(value());
         }
         return decltype(f(std::declval<T>()))::err(error());
     }
 
-private:
+  private:
     explicit Result(T val) : data_(std::move(val)) {}
     explicit Result(std::string err) : data_(std::move(err)) {}
 
@@ -472,7 +468,8 @@ inline auto parse_int(std::string_view input) -> Result<int> {
         size_t pos = 0;
         int result = std::stoi(std::string(input), &pos);
         if (pos != input.size()) {
-            return Result<int>::err("Invalid integer: trailing characters in '" + std::string(input) + "'");
+            return Result<int>::err("Invalid integer: trailing characters in '" +
+                                    std::string(input) + "'");
         }
         return Result<int>::ok(result);
     } catch (const std::exception&) {
@@ -480,7 +477,7 @@ inline auto parse_int(std::string_view input) -> Result<int> {
     }
 }
 
-} // namespace {{PROJECT_NAME}}
+} // namespace {{PROJECT_NAME_ID}}
 )";
 
 constexpr const char* example_cpp = R"(#include <iostream>
@@ -493,19 +490,19 @@ constexpr const char* example_cpp = R"(#include <iostream>
 
 int main() {
     // Call pure functions
-    std::cout << {{PROJECT_NAME}}::greet("World") << std::endl;
+    std::cout << {{PROJECT_NAME_ID}}::greet("World") << std::endl;
 
     // Demonstrate pure arithmetic
-    std::cout << "2 + 3 = " << {{PROJECT_NAME}}::add(2, 3) << std::endl;
+    std::cout << "2 + 3 = " << {{PROJECT_NAME_ID}}::add(2, 3) << std::endl;
 
     // Use Result for error handling
-    auto result = {{PROJECT_NAME}}::parse_int("42");
+    auto result = {{PROJECT_NAME_ID}}::parse_int("42");
     if (result.is_ok()) {
         std::cout << "Parsed: " << result.value() << std::endl;
     }
 
     // Demonstrate error handling
-    auto bad_result = {{PROJECT_NAME}}::parse_int("not_a_number");
+    auto bad_result = {{PROJECT_NAME_ID}}::parse_int("not_a_number");
     if (bad_result.is_err()) {
         std::cout << "Error: " << bad_result.error() << std::endl;
     }
@@ -524,24 +521,24 @@ constexpr const char* test_main_cpp = R"(#include <cassert>
 // =============================================================================
 
 void test_greet() {
-    assert({{PROJECT_NAME}}::greet("World") == "Hello, World!");
-    assert({{PROJECT_NAME}}::greet("") == "Hello, !");
+    assert({{PROJECT_NAME_ID}}::greet("World") == "Hello, World!");
+    assert({{PROJECT_NAME_ID}}::greet("") == "Hello, !");
     std::cout << "[PASS] test_greet" << std::endl;
 }
 
 void test_add() {
-    assert({{PROJECT_NAME}}::add(2, 3) == 5);
-    assert({{PROJECT_NAME}}::add(-1, 1) == 0);
-    assert({{PROJECT_NAME}}::add(0, 0) == 0);
+    assert({{PROJECT_NAME_ID}}::add(2, 3) == 5);
+    assert({{PROJECT_NAME_ID}}::add(-1, 1) == 0);
+    assert({{PROJECT_NAME_ID}}::add(0, 0) == 0);
     std::cout << "[PASS] test_add" << std::endl;
 }
 
 void test_parse_int_success() {
-    auto result = {{PROJECT_NAME}}::parse_int("42");
+    auto result = {{PROJECT_NAME_ID}}::parse_int("42");
     assert(result.is_ok());
     assert(result.value() == 42);
 
-    auto negative = {{PROJECT_NAME}}::parse_int("-123");
+    auto negative = {{PROJECT_NAME_ID}}::parse_int("-123");
     assert(negative.is_ok());
     assert(negative.value() == -123);
 
@@ -549,25 +546,25 @@ void test_parse_int_success() {
 }
 
 void test_parse_int_failure() {
-    auto result = {{PROJECT_NAME}}::parse_int("abc");
+    auto result = {{PROJECT_NAME_ID}}::parse_int("abc");
     assert(result.is_err());
 
-    auto empty = {{PROJECT_NAME}}::parse_int("");
+    auto empty = {{PROJECT_NAME_ID}}::parse_int("");
     assert(empty.is_err());
 
-    auto trailing = {{PROJECT_NAME}}::parse_int("42abc");
+    auto trailing = {{PROJECT_NAME_ID}}::parse_int("42abc");
     assert(trailing.is_err());
 
     std::cout << "[PASS] test_parse_int_failure" << std::endl;
 }
 
 void test_result_map() {
-    auto result = {{PROJECT_NAME}}::parse_int("10");
+    auto result = {{PROJECT_NAME_ID}}::parse_int("10");
     auto doubled = result.map([](int x) { return x * 2; });
     assert(doubled.is_ok());
     assert(doubled.value() == 20);
 
-    auto err = {{PROJECT_NAME}}::parse_int("invalid");
+    auto err = {{PROJECT_NAME_ID}}::parse_int("invalid");
     auto doubled_err = err.map([](int x) { return x * 2; });
     assert(doubled_err.is_err());
 
@@ -800,7 +797,7 @@ cmake --build build
 #include "{{PROJECT_NAME}}/{{PROJECT_NAME}}.hpp"
 
 int main() {
-    auto msg = {{PROJECT_NAME}}::hello();
+    auto msg = {{PROJECT_NAME_ID}}::hello();
     return 0;
 }
 ```
@@ -834,7 +831,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Check clang-format
-        run: find src include -name '*.cpp' -o -name '*.hpp' | xargs clang-format --dry-run --Werror 2>/dev/null || true
+        run: find src include -name '*.cpp' -o -name '*.hpp' | xargs clang-format --dry-run --Werror
 
   build:
     strategy:
@@ -853,8 +850,14 @@ jobs:
       - name: Build
         run: cmake --build build --config Release
 
-      - name: Run tests
-        run: ctest --test-dir build --output-on-failure --config Release
+      - name: Run tests (Unix)
+        if: runner.os != 'Windows'
+        run: ctest --test-dir build --output-on-failure
+
+      - name: Run tests (Windows)
+        if: runner.os == 'Windows'
+        working-directory: build
+        run: ctest --output-on-failure -C Release
 
   coverage:
     runs-on: ubuntu-latest

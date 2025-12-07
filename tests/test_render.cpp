@@ -228,6 +228,54 @@ TEST_CASE("render handles adjacent placeholders", "[render]") {
 }
 
 // =============================================================================
+// render() PROJECT_NAME_ID (safe C++ identifier)
+// =============================================================================
+
+TEST_CASE("render PROJECT_NAME_ID converts hyphens to underscores", "[render]") {
+    RenderContext ctx{
+        .project_name = "my-cool-project",
+        .description = "",
+        .cpp_std = "20",
+        .author = "",
+        .year = "2025",
+        .license_name = ""};
+
+    std::string tmpl = "namespace {{PROJECT_NAME_ID}} {}";
+    auto result = render(tmpl, ctx);
+    REQUIRE(result == "namespace my_cool_project {}");
+}
+
+TEST_CASE("render PROJECT_NAME_ID preserves underscores", "[render]") {
+    RenderContext ctx{
+        .project_name = "my_project",
+        .description = "",
+        .cpp_std = "20",
+        .author = "",
+        .year = "2025",
+        .license_name = ""};
+
+    std::string tmpl = "{{PROJECT_NAME_ID}}";
+    auto result = render(tmpl, ctx);
+    REQUIRE(result == "my_project");
+}
+
+TEST_CASE("render PROJECT_NAME_ID works with PROJECT_NAME together", "[render]") {
+    RenderContext ctx{
+        .project_name = "my-lib",
+        .description = "",
+        .cpp_std = "20",
+        .author = "",
+        .year = "2025",
+        .license_name = ""};
+
+    std::string tmpl = R"(#include "{{PROJECT_NAME}}/result.hpp"
+namespace {{PROJECT_NAME_ID}} {})";
+    auto result = render(tmpl, ctx);
+    REQUIRE(result == R"(#include "my-lib/result.hpp"
+namespace my_lib {})");
+}
+
+// =============================================================================
 // get_license_display_name()
 // =============================================================================
 

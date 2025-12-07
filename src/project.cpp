@@ -34,16 +34,17 @@ auto add_common_files(ProjectFiles& project, const Options& opts, const RenderCo
     // LICENSE
     if (opts.license != "none") {
         const char* license_tmpl = nullptr;
-        if (opts.license == "mit")
+        if (opts.license == "mit") {
             license_tmpl = templates::license_mit;
-        else if (opts.license == "apache2")
+        } else if (opts.license == "apache2") {
             license_tmpl = templates::license_apache2;
-        else if (opts.license == "gpl3")
+        } else if (opts.license == "gpl3") {
             license_tmpl = templates::license_gpl3;
-        else if (opts.license == "bsd3")
+        } else if (opts.license == "bsd3") {
             license_tmpl = templates::license_bsd3;
+        }
 
-        if (license_tmpl) {
+        if (license_tmpl != nullptr) {
             project.files.push_back({opts.project_name + "/LICENSE", render(license_tmpl, ctx)});
         }
     }

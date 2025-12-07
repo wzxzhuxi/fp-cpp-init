@@ -13,6 +13,18 @@ auto render(std::string_view tmpl, const RenderContext& ctx) -> std::string {
         }
     };
 
+    // 生成合法的 C++ 标识符（将 - 替换为 _）
+    auto make_identifier = [](const std::string& name) {
+        std::string id = name;
+        for (char& c : id) {
+            if (c == '-') {
+                c = '_';
+            }
+        }
+        return id;
+    };
+
+    replace_all("{{PROJECT_NAME_ID}}", make_identifier(ctx.project_name));
     replace_all("{{PROJECT_NAME}}", ctx.project_name);
     replace_all("{{DESCRIPTION}}", ctx.description.empty() ? "A C++ project" : ctx.description);
     replace_all("{{CXX_STD}}", ctx.cpp_std);
@@ -24,14 +36,18 @@ auto render(std::string_view tmpl, const RenderContext& ctx) -> std::string {
 }
 
 auto get_license_display_name(std::string_view license) -> std::string {
-    if (license == "mit")
+    if (license == "mit") {
         return "MIT License";
-    if (license == "apache2")
+    }
+    if (license == "apache2") {
         return "Apache License 2.0";
-    if (license == "gpl3")
+    }
+    if (license == "gpl3") {
         return "GNU General Public License v3.0";
-    if (license == "bsd3")
+    }
+    if (license == "bsd3") {
         return "BSD 3-Clause License";
+    }
     return "";
 }
 
