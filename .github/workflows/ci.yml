@@ -10,15 +10,12 @@ jobs:
   # 代码格式检查
   format:
     runs-on: ubuntu-latest
+    container: archlinux:latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install latest clang-format
-        run: |
-          wget https://apt.llvm.org/llvm.sh
-          chmod +x llvm.sh
-          sudo ./llvm.sh all
-          sudo apt-get install -y clang-format
+      - name: Install clang
+        run: pacman -Sy --noconfirm clang
 
       - name: Check clang-format
         run: |
@@ -111,14 +108,13 @@ jobs:
       - name: Build
         run: cmake --build build --config Debug
 
-      - name: Run unit tests
-        shell: bash
-        run: |
-          if [[ "$RUNNER_OS" == "Windows" ]]; then
-            ctest --test-dir build --output-on-failure --config Debug
-          else
-            ctest --test-dir build --output-on-failure
-          fi
+      - name: Run unit tests (Unix)
+        if: runner.os != 'Windows'
+        run: ctest --test-dir build --output-on-failure
+
+      - name: Run unit tests (Windows)
+        if: runner.os == 'Windows'
+        run: ctest --test-dir build --output-on-failure --config Debug
 
   # 代码覆盖率（仅 Linux）
   coverage:
