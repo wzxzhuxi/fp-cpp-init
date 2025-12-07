@@ -114,7 +114,8 @@ jobs:
 
       - name: Run unit tests (Windows)
         if: runner.os == 'Windows'
-        run: ctest --test-dir build --output-on-failure --config Debug
+        working-directory: build
+        run: ctest --output-on-failure -C Debug
 
   # 代码覆盖率（仅 Linux）
   coverage:
